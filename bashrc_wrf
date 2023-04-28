@@ -27,17 +27,18 @@ export LC_ALL="en_US.UTF-8"
 
 #WRF
 export WRF_EM_CORE=1
+export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 
 #NETCDF
-export NETCDF=$PWD/localsrc/netcdf
+export LCLSRC=$HOME/localsrc
+export NETCDF=$LCLSRC/netcdf
 export NETCDF_INC=$NETCDF/include
 export NETCDF_LIB=$NETCDF/lib
 export NETCDF_BIN=$NETCDF/bin
 # Copy over NETCDF files to common directory since netcdf C and FORTRAN modules are separate
-rm -rf localsrc
-#rm -rf $NETCDF
-mkdir -p localsrc
-mkdir $NETCDF
+rm -rf $LCLSRC
+mkdir -p $LCLSRC
+mkdir -p $NETCDF
 mkdir $NETCDF/include
 mkdir $NETCDF/lib
 mkdir $NETCDF/bin

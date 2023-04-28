@@ -1,0 +1,39 @@
+&share
+ wrf_core = 'ARW',
+ max_dom = 2,
+ start_date = '2007-08-18_21:00:00','2007-08-18_21:00:00',
+ end_date   = '2007-08-19_21:00:00','2007-08-19_21:00:00',
+ interval_seconds = 3600
+ io_form_geogrid = 2,
+/
+
+&geogrid
+ parent_id         =   1,   1, 2,
+ parent_grid_ratio =   1,   5, 3,
+ i_parent_start    =   1,  48, 82,
+ j_parent_start    =   1,  35, 75,
+ e_we              =  175, 331, 1249,
+ e_sn              =  125, 311, 751,
+ geog_data_res = '30s','30s','30s',
+ dx = 15000,
+ dy = 15000,
+ map_proj = 'lambert',
+ ref_lat   = 34.6,
+ ref_lon   = -98.,
+ truelat1  =  30.0,
+ truelat2  =  60.0,
+ stand_lon = -98.,
+ geog_data_path = '/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/WPS_GEOG/'
+ opt_geogrid_tbl_path = './geogrid/'
+/
+
+&ungrib
+ out_format = 'WPS',
+ prefix = 'FILE',
+/
+
+&metgrid
+ fg_name = 'FILE'
+ io_form_metgrid = 2, 
+ opt_metgrid_tbl_path = './',
+/
