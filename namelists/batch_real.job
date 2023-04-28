@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH -J wrf-job
+#SBATCH -N 1
+#SBATCH -n 25 # Set this to 28 * N (but an even digit of 10)
+#SBATCH --exclusive
+#SBATCH -p radclouds
+#SBATCH -t 00:20:00
+#SBATCH -o out_wrf.%j
+
+source bashrc_wrf
+
+which mpirun
+time mpirun ./real.exe
+
