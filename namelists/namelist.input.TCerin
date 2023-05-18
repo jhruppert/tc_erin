@@ -22,6 +22,7 @@
  io_form_input                       = 2
  io_form_boundary                    = 2
  debug_level                         = 50
+ iofields_filename = "var_extra_output","var_extra_output","var_extra_output",
  ignore_iofields_warning = .true.,
  /
 
@@ -57,8 +58,9 @@
  icloud                              = 1,
  mp_physics                          = 28, 28,
  bl_pbl_physics                      = 5, 5,
- sf_sfclay_physics                   = 2, 2,
- sf_surface_physics                  = 5, 5,
+ icloud_bl                           = 1,
+ sf_sfclay_physics                   = 5, 5,
+ sf_surface_physics                  = 2, 2,
  radt                                = 15,     3,
  bldt                                = 0,     0,     0,
  cudt                                = 5,     5,     5,
