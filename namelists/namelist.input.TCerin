@@ -1,4 +1,4 @@
- &time_control
+&time_control
  start_year                          = 2007, 2007,
  start_month                         = 08,   08,
  start_day                           = 18,   18,
@@ -31,9 +31,9 @@
  time_step_fract_den                 = 1,
  reasonable_time_step_ratio          = 10,
  max_dom                             = 2,
- e_we                                = 175,  331,
- e_sn                                = 125,  311,
- e_vert                              = 65,    65,    65,
+ e_we                                = 375,  1071,
+ e_sn                                = 340,  1051,
+ e_vert                              = 55,    55,    55,
  p_top_requested                     = 1000,
  num_metgrid_levels                  = 38,
  num_metgrid_soil_levels             = 4,
@@ -41,8 +41,8 @@
  dy                                  = 6000,  1000,
  grid_id                             = 1,     2,     3,
  parent_id                           = 0,     1,     2,
- i_parent_start                      = 1,    48,    82,
- j_parent_start                      = 1,    35,    75,
+ i_parent_start                      = 1,    95,    82,
+ j_parent_start                      = 1,    65,    75,
  parent_grid_ratio                   = 1,     5,     3,
  parent_time_step_ratio              = 1,     5,     3,
  feedback                            = 0,
@@ -119,3 +119,4 @@
  nio_tasks_per_group = 0,
  nio_groups = 1,
  /
+
