@@ -1,6 +1,7 @@
 from distutils.log import info
 from netCDF4 import Dataset
 import numpy as np
+import os
 import sys
 import subprocess
 import xarray as xr
@@ -21,39 +22,66 @@ import glob
 # itest   = 'crfon60h'
 istorm = 'erin'
 i_senstest = 'none'
-var_tag = 'pressure'
+var_tag = 'avo'
 basis = 0
 
 # ------------------------------------------
 # File pattern
-filepattern = '/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/colin/erin/test/output/raw/wrfout_d02*'
-filepaths = glob.glob(filepattern)
-Data = []
-for filepath in filepaths:
-    dataset = Dataset(filepath)
-    Data.append(dataset)
+directory = '/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/colin/erin/test/output/raw'  # Replace with the path to your directory
+prefix = 'wrfout_d02'  # Replace with the desired file prefix
 
-varname = 'pressure'
-var = wrf.getvar(Data, varname)
-lon = []
-lat = []
+#file_count = sum(1 for file in os.listdir(directory) if file.startswith(prefix))
+ # Replace with the desired number of files to process
 
-max_iterations = 200  # Maximum number of iterations to prevent infinite loop
-iteration_count = 0
+# Get a list of files in the directory that start with the given prefix
+#file_list = [file for file in os.listdir(directory) if file.startswith(prefix)]
 
-for dataset in Data:
-    lon.append(dataset.variables['XLONG'][:])  # deg
-    lat.append(dataset.variables['XLAT'][:])  # deg
+# Sort the file list to ensure consistent processing order
+#file_list.sort()
+varname = 'avo'
+# Iterate over the specified number of files or the available files if fewer
+#lat_accum = None
+#lon_accum = None
+#var_accum = None
 
-    iteration_count += 1
-    if iteration_count > max_iterations:
-        raise Exception("Exceeded maximum iteration count. Possible infinite loop detected.")
+#for i, file_to_load in enumerate(file_list[:file_count]):
+#    file_path = os.path.join(directory, file_to_load)
+#    print(f"Processing file {i+1}: {file_path}")
+#    Data = wrf.getvar(Dataset(file_path), varname, timeidx=wrf.ALL_TIMES)
+#    
+#    if lat_accum is None:
+#        lat_accum = wrf.latlon_coords(Data)[0]
+#        lon_accum = wrf.latlon_coords(Data)[1]
+#        var_accum = Data.values
+#    else:
+#        lat_accum += wrf.latlon_coords(Data)[0]
+#        lon_accum += wrf.latlon_coords(Data)[1]
+#        var_accum += Data.values
+#
+#lat = xr.DataArray(lat_accum)
+#lon = xr.DataArray(lon_accum)
+#f = xr.DataArray(var_accum, dims=('time', 'y', 'x'))
 
-lon = np.array(lon)
-lat = np.array(lat)
-lon1d = lon[0, :]
-lat1d = lat[:, 0]
-#lat, lon = wrf.latlon_coords(var)
+process = subprocess.Popen(['ls '+directory+'/'+ prefix+'*'],shell=True,
+    stdout=subprocess.PIPE,universal_newlines=True)
+output = process.stdout.readline()
+m1ctl = output.strip() #[3]
+fil = Dataset(m1ctl) # this opens the netcdf file
+lon = fil.variables['XLONG'][:][0] # deg
+lon1d=lon[0,:]
+lat = fil.variables['XLAT'][:][0] # deg
+lat1d=lat[:,0]
+Data = Dataset('/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/stitchd02_wrfout.nc')
+var = wrf.getvar(Dataset('/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/stitchd02_wrfout.nc'), varname, timeidx=wrf.ALL_TIMES)
+print (var.shape)
+print (lon.shape)
+if var.shape!= (3):
+    print("The shape is all wrong bro")
+
+fil.close()
+llshape=np.shape(lon)
+nx = llshape[1]
+ny = llshape[0]
 
 
 # Run tracking
