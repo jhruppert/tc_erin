@@ -131,6 +131,7 @@ track, var_masked = object_track(var, lon, lat, i_senstest, basis)
 clon = track[0, :]
 clat = track[1, :]
 
+#Printing message
 print("Tracking done, onto the netCDF file!")
 # Write out to netCDF file
 file_out = istorm + 'track_' + var_tag + '.nc'
