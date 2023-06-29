@@ -14,7 +14,7 @@ import glob
 
 
 # Choices
-ptrack  = 850 # tracking pressure level
+ptrack  = 800 # tracking pressure level
 #istorm  = 'haiyan'
 # istorm  = 'maria'
 # imemb   = 'memb_01'
@@ -24,7 +24,7 @@ ptrack  = 850 # tracking pressure level
 # itest   = 'crfon60h'
 istorm = 'erin'
 i_senstest = False
-var_tag = 'U'
+var_tag = 'rvor'
 basis = 0
 
 # ------------------------------------------
@@ -69,25 +69,37 @@ pres = wrf.getvar(fil, "pressure", wrf.ALL_TIMES)
 ikread = np.where(pres == ptrack)[0][0]
 print("I believe we have successfully read in the pressure variables.")
 
-process = subprocess.Popen(['ls '+directory+'/'+ prefix+'*'],shell=True,
-    stdout=subprocess.PIPE,universal_newlines=True)
-output = process.stdout.readline()
-m1ctl = output.strip() #[3]
-fil = Dataset(m1ctl) # this opens the netcdf file
-lon = fil.variables['XLONG'][:][0] # deg
+#process = subprocess.Popen(['ls '+directory+'/'+ prefix+'*'],shell=True,
+#    stdout=subprocess.PIPE,universal_newlines=True)
+#output = process.stdout.readline()
+#m1ctl = output.strip() #[3]
+#fil = Dataset(m1ctl) # this opens the netcdf file
+#lon = fil.variables['XLONG'][:][0] # deg
+#lon1d=lon[0,:]
+#print("Longitude? Recieved!")
+#lat = fil.variables['XLAT'][:][0] # deg
+#lat1d=lat[:,0]
+#print("Woah, Latitude was quick!")
+Data1 = Dataset('/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/colin/erin/test/output/postproc/nc_interp_U')
+Data2 = Dataset('/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/colin/erin/test/output/postproc/ncinterp_V')
+
+lon = Data1.variables['XLONG'][:][0] # deg
 lon1d=lon[0,:]
 print("Longitude? Recieved!")
-lat = fil.variables['XLAT'][:][0] # deg
+lat = Data1.variables['XLAT'][:][0] # deg
 lat1d=lat[:,0]
-print("Woah, Latitude was quick!")
-Data = Dataset('/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/stitchd02_wrfout.nc')
+
 if var_tag == 'rvor':
 
         # Horizontal wind
-        #u = Data.variables['U'][:, ikread, :, :]  # m/s
-        #v = Data.variables['V'][:, ikread, :, :] 
-        u = wrf.getvar(Data, "ua", wrf.ALL_TIMES)[:,3,:,:]
-        v = wrf.getvar(Data, "va", wrf.ALL_TIMES)[:,3,:,:]
+
+        u = Data1.variables['U'] # m/s
+        v = Data2.variables['V']
+        u = Data1.variables['U'][:,1,:,:] # m/s
+        v = Data2.variables['V'][:,1,:,:]
+        
+        print()
+        
         print("that worked! thank the lord!")
         print(u.shape)
         print(v.shape)
@@ -134,10 +146,10 @@ clat = track[1, :]
 #Printing message
 print("Tracking done, onto the netCDF file!")
 # Write out to netCDF file
-file_out = istorm + 'track_' + var_tag + '.nc'
+file_out = istorm + '1000mtrack_' + var_tag + '.nc'
 ncfile = Dataset(file_out, mode='w')
 
-time_dim = ncfile.createDimension('time', len(wrf.extract_times(Data, wrf.ALL_TIMES)))
+time_dim = ncfile.createDimension('time', 61)
 
 clat = ncfile.createVariable('clat', np.float64, ('time',))
 clat.units = 'degrees_north'
