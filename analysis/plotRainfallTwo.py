@@ -12,8 +12,8 @@ import xarray as xr
 
 
 # Specify the input and output file paths
-grib_filepath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081912.24h"
-nc_filepath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081912.24h.nc"
+grib_filepath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081918.06h"
+nc_filepath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081918.06h.nc"
 
 
 # Open the GRIB file
@@ -24,12 +24,12 @@ grib_data.close()
 # Import data
 directory = '/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/colin/erin/test/output/raw/'  # Replace with the path to your directory
 prefix = 'wrfout_d02'
-timeStep = '08-19_12:00:00'
-timeStepSub = '08-18_12:00:00'
+timeStep = '08-19_18:00:00'
+timeStepSub = '08-19_12:00:00'
 simData = Dataset(directory+prefix+"_2007-" + timeStep)
 subSimData = Dataset(directory+prefix+"_2007-" + timeStepSub)
 #Import NOAA Stage IV
-stageIVdatapath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081912.24h.nc"
+stageIVdatapath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081918.06h.nc"
 stageIVdata = Dataset(stageIVdatapath)
 process = subprocess.Popen(['ls '+directory+prefix+"_2007-" + timeStep],shell=True,
     stdout=subprocess.PIPE,universal_newlines=True)
@@ -60,7 +60,7 @@ precip2 = precip[0,:,:]
 precip = precip1 - precip2
 
 # Coarsen the simulated WRF rainfall data
-coarsening_factor = 3  # Adjust this factor to change the coarseness
+coarsening_factor = 1 # Adjust this factor to change the coarseness
 coarse_lon = lon[::coarsening_factor, ::coarsening_factor]
 coarse_lat = lat[::coarsening_factor, ::coarsening_factor]
 coarse_precip = precip[::coarsening_factor, ::coarsening_factor]
@@ -78,9 +78,13 @@ crs = ccrs.PlateCarree()
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6), subplot_kw={'projection': crs})
 plt.subplots_adjust(wspace=0.3)
 
-# Set the extent for both subplots
-ax1.set_extent([-102, -96, 32, 38], crs=crs)
-ax2.set_extent([-102, -96, 32, 38], crs=crs)
+# Set the extent for both subplots LEGACY
+#ax1.set_extent([-102, -96, 32, 38], crs=crs)
+#ax2.set_extent([-102, -96, 32, 38], crs=crs)
+
+# Set the extent for both subplots 
+ax1.set_extent([-99.5, -93.5, 33, 39], crs=crs)
+ax2.set_extent([-99.5, -93.5, 33, 39], crs=crs)
 
 nws_precip_colors = [
     "#fdfdfd",
@@ -92,7 +96,7 @@ nws_precip_colors = [
     "#008e00",  # 1.00 - 1.50 inches
     "#fdf802",  # 1.50 - 2.00 inches
     "#e5bc00",  # 2.00 - 2.50 inches
-    "#fd9500",  # 2.50 - 3.00 inches
+    "#fd9500",  # 2.50 - 3.00 inches 
     "#fd0000",  # 3.00 - 4.00 inches
     "#d40000",  # 4.00 - 5.00 inches
     "#bc0000",  # 5.00 - 6.00 inches
@@ -108,12 +112,12 @@ norm = mpl.colors.BoundaryNorm(levels, 16)
 ax1.pcolormesh(coarse_lon, coarse_lat, coarse_precip, norm=norm, cmap=precip_colormap)
 cbar1 = fig.colorbar(ax1.collections[0], ax=ax1, orientation='horizontal', fraction=0.046, pad=0.04, extend='max', ticks=levels)
 cbar1.ax.set_xlabel('Rainfall in mm')
-cbar1.ax.tick_params(labelsize=6)
+cbar1.ax.tick_params(labelsize=7)
 
 ax2.pcolormesh(rlon, rlat, tp, norm=norm, cmap=precip_colormap)
 cbar2 = fig.colorbar(ax2.collections[0], ax=ax2, orientation='horizontal', fraction=0.046, pad=0.04, extend='max', ticks=levels)
 cbar2.ax.set_xlabel('Rainfall in mm')
-cbar2.ax.tick_params(labelsize=6)
+cbar2.ax.tick_params(labelsize=7)
 
 # Add state lines
 states = cfeature.NaturalEarthFeature(
@@ -139,9 +143,9 @@ title_font = {
     'fontweight': 'bold',
     'fontfamily': 'Open Sans'
 }
-fig.suptitle('24 Hour Rainfall Comparison at 12:00 UTC on August 19th, 2007', **title_font)
+fig.suptitle('6 Hour Rainfall Comparison at 18:00 UTC on August 19th, 2007', **title_font)
 
 plt.tight_layout()  # Apply tight layout
 
-plt.savefig("/home/colinwelty/wrf-stuff/erinproc/rainfallsim-" + timeStep + "24.png")
+plt.savefig("/home/colinwelty/wrf-stuff/erinproc/rainfallsimtest-" + timeStep + "-6.png")
 plt.close(fig)

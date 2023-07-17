@@ -1,5 +1,6 @@
 import netCDF4
 from netCDF4 import Dataset
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import wrf
@@ -11,8 +12,8 @@ import xarray as xr
 
 
 # Specify the input and output file paths
-grib_filepath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081910.01h"
-nc_filepath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081910.01h.nc"
+grib_filepath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081912.24h"
+nc_filepath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081912.24h.nc"
 
 
 # Open the GRIB file
@@ -23,12 +24,12 @@ grib_data.close()
 # Import data
 directory = '/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/colin/erin/test/output/raw/'  # Replace with the path to your directory
 prefix = 'wrfout_d02'
-timeStep = '08-17_22:00:00'
-timeStepSub = '08-17_21:00:00'
+timeStep = '08-19_12:00:00'
+timeStepSub = '08-18_12:00:00'
 simData = Dataset(directory+prefix+"_2007-" + timeStep)
 subSimData = Dataset(directory+prefix+"_2007-" + timeStepSub)
 #Import NOAA Stage IV
-stageIVdatapath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081910.01h.nc"
+stageIVdatapath = "/ourdisk/hpc/radclouds/auto_archive_notyet/tape_2copies/tc_erin/colin60186/ST4.2007081912.24h.nc"
 stageIVdata = Dataset(stageIVdatapath)
 process = subprocess.Popen(['ls '+directory+prefix+"_2007-" + timeStep],shell=True,
     stdout=subprocess.PIPE,universal_newlines=True)
@@ -66,21 +67,24 @@ rlon = stageIVdata.variables['longitude']
 rlat = stageIVdata.variables['latitude']
 tp = stageIVdata.variables['tp']
 
+anom = tp - precip
 
-#Add projection
 crs = ccrs.PlateCarree()
-
 # Create the figure and subplots
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6), subplot_kw={'projection': crs})
+# Create the figure and subplots
+fig, ax = plt.subplots(figsize=(14, 10), subplot_kw={'projection': crs})
 
 # Set the extent for both subplots
-ax1.set_extent([-102, -96, 32, 38], crs=crs)
-ax2.set_extent([-102, -96, 32, 38], crs=crs)
+ax.set_extent([-102, -96, 32, 38], crs=crs)
 
-# Plot simulated WRF rainfall
-pcm1 = ax1.pcolormesh(lon, lat, precip, cmap='PuBu', transform=crs)
 
-# Add state lines with higher zorder to ensure visibility
+ax.pcolormesh(lon, lat, anom, cmap="coolwarm")
+cbar1 = fig.colorbar(ax.collections[0], ax=ax, fraction=0.046, pad=0.04, extend='max')
+cbar1.ax.set_ylabel('Rainfall Anomaly in Millimeters')
+
+
+
+# Add state lines
 states = cfeature.NaturalEarthFeature(
     category='cultural',
     name='admin_1_states_provinces_lines',
@@ -88,31 +92,18 @@ states = cfeature.NaturalEarthFeature(
     facecolor='none',
     edgecolor='black'
 )
-ax1.add_feature(states, linewidth=0.5, zorder=3)
+ax.add_feature(states, linewidth=1.5)
 
-cbar1 = fig.colorbar(pcm1, ax=ax1, orientation='horizontal', pad=0.05)
-cbar1.ax.set_xlabel('Rainfall in mm')
+gl1 = ax.gridlines(crs=crs, draw_labels=True, alpha=0.5)
 
-# Plot NOAA Stage IV rainfall
-pcm2 = ax2.pcolormesh(rlon, rlat, tp, cmap='PuBu', transform=crs)
 
-# Add state lines with higher zorder to ensure visibility
-ax2.add_feature(states, linewidth=0.5, zorder=3)
+# Customize the title font size and type
+title_font = {
+    'fontsize': 28,
+    'fontweight': 'bold',
+    'fontfamily': 'Open Sans'
+}
+fig.suptitle('24 Hour Rainfall Anomaly Between Simulated and Observed', **title_font)
 
-cbar2 = fig.colorbar(pcm2, ax=ax2, orientation='horizontal', pad=0.05)
-cbar2.ax.set_xlabel('Rainfall in mm')
-
-# Set titles and labels
-ax1.set_title("Simulated WRF Rainfall", fontsize=12)
-ax2.set_title("NOAA Stage IV Rainfall", fontsize=12)
-
-# Remove gridlines
-ax1.gridlines(draw_labels=False)
-ax2.gridlines(draw_labels=False)
-
-# Adjust spacing and layout
-plt.tight_layout()
-
-# Save the figure
-plt.savefig("/home/colinwelty/wrf-stuff/erinproc/rainfallsim-" + timeStep + ".png", dpi=300)
+plt.savefig("/home/colinwelty/wrf-stuff/erinproc/rainfallanom-" + timeStep + "24.png")
 plt.close(fig)

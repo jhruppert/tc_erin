@@ -73,7 +73,7 @@ def interp_variable(input_file, variable_name, output_dir, vertical_levels):
                 interp_variable = wrf.interplevel(variable,agl_heights,vertical_levels,meta=False)
                 #print(np.shape(interp_variable))
                 #print(np.shape(output_variable[t,...]))
-                output_variable[t,...] = interp_variable[...]
+                output_variable[t,:,:,:] = interp_variable[:,:,:]
                 print("Confirmation this is working")
                 #sys.exit()
             # Make sure you close the input and output files at the end
@@ -104,10 +104,10 @@ def interp_variable(input_file, variable_name, output_dir, vertical_levels):
             output_variable.setncatts(temp_atts)
             for t in range(dataset.dimensions['Time'].size):
                 variable = wrf.getvar(dataset, 'va', timeidx=t, meta=False)
-                pressure_heights = wrf.getvar(dataset, 'pressure', timeidx=t, meta=False)
-                interp_variable = wrf.interplevel(variable,pressure_heights,vertical_levels,meta=False)
+                agl_heights = wrf.getvar(dataset, 'height_agl', timeidx=t, meta=False)
+                interp_variable = wrf.interplevel(variable,agl_heights,vertical_levels,meta=False)
                 #interp_variable = wrf.interplevel(variable,pressure_heights,vertical_levels,meta=False)
-                output_variable[t,...] = interp_variable
+                output_variable[t,:,:,:] = interp_variable[:,:,:]
                 #output_variable[t, ...] = np.expand_dims(interp_variable, axis=0)
             # Make sure you close the input and output files at the end
             output_dataset.close()
