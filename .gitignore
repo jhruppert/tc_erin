@@ -2,3 +2,7 @@ era5/era5data
 WRF/
 stitch*
 era5/ERA5*
+*.nc
+colin60186/*
+*_U
+*_V
