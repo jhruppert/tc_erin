@@ -78,6 +78,9 @@ for jh in range(len(hrs)):
             except ValueError:
                 print(f"Value Error, skipping lat/lon = {latlon}, jh = {jh}")
                 continue
+            except requests.exceptions.HTTPError:
+                print(f"HTTP Error, skipping lat/lon = {latlon}, jh = {jh}")
+                continue
 
             # extract variables
             p = clean_data['p']
